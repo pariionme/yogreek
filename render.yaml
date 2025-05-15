@@ -1,0 +1,68 @@
+services:
+  # Frontend Next.js application
+  - type: web
+    name: yogreek-frontend
+    env: node
+    plan: free
+    buildCommand: |
+      cd frontend
+      rm -rf node_modules package-lock.json
+      npm cache clean --force
+      npm install --legacy-peer-deps
+      npm install next@14.0.1 --legacy-peer-deps
+      echo 'NEXT_PUBLIC_API_URL="https://yogreek-product-service-0bdh.onrender.com"' > .env.production
+      npm run build
+    startCommand: cd frontend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        value: https://yogreek-product-service-0bdh.onrender.com
+      - key: PORT
+        value: 3000
+    healthCheckPath: /
+    autoDeploy: true
+
+  # Product Service
+  - type: web
+    name: yogreek-product-service
+    env: python
+    plan: free
+    buildCommand: |
+      cd ecommerce/product_service
+      python -m pip install --upgrade pip
+      pip install -r requirements.txt
+      python manage.py makemigrations products
+      python manage.py collectstatic --noinput
+    startCommand: |
+      cd ecommerce/product_service
+      python manage.py migrate
+      python manage.py migrate products
+      python create_superuser.py
+      gunicorn product_service.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 60
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: product_service.settings_prod
+      - key: DATABASE_URL
+        fromDatabase:
+          name: yogreek-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: DEBUG
+        value: "True"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://*.onrender.com,http://*.onrender.com"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    healthCheckPath: /api/health/
+    autoDeploy: true
+
+databases:
+  - name: yogreek-db
+    databaseName: yogreek
+    plan: free 

@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/page.js", "app/layout.js", "app/cart/page.js", "app/all/page.js", "app/checkout/page.js", "app/login/page.js", "app/order-status/page.js", "app/product/[id]/page.js", "app/product/[id]/loading.js", "app/product/[id]/exact-match.js", "app/login/layout.js", "app/checkout/with-cart-integration.js", "app/checkout/with-header.js", "app/all/loading.js", "app/loading.js", "app/all/page-with-cart-integretion.js"],
+  "exclude": ["node_modules"]
+}
